@@ -39,7 +39,7 @@ export default function SignInScreen() {
       <View style={styles.content}>
         <View style={styles.logoContainer}>
           <Image 
-            source={require('../assets/images/nilababy-logo.png')}
+            source={require('../assets/images/Logo.png')}
             style={styles.logo}
             contentFit="contain"
           />
