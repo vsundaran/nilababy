@@ -1,13 +1,12 @@
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
+import {
+  Text,
+  View,
   Animated,
   Pressable,
-  Platform
+  StyleSheet
 } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
-import { Colors } from '../../constants/Colors';
+import { Theme } from '../../constants/Theme';
 
 interface GoogleSignInButtonProps {
   onPress: () => void;
@@ -64,7 +63,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onPress,
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.Colors.white,
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 24,
@@ -97,8 +96,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    fontWeight: '600',
     color: '#3C4043',
-    fontFamily: Platform.OS === 'android' ? 'sans-serif-medium' : undefined,
+    fontFamily: Theme.Typography.fontFamily.bold,
   },
 });

@@ -1,6 +1,5 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../../constants/Colors';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Theme } from '../../constants/Theme';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -32,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({ darkMode = false, onThemeToggle 
             <MaterialIcons 
               name={darkMode ? "light-mode" : "dark-mode"} 
               size={20} 
-              color={Colors.primary} 
+              color={Theme.Colors.primary} 
             />
           </TouchableOpacity>
         </View>
@@ -110,20 +109,20 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: '700',
     letterSpacing: -0.5,
+    fontFamily: Theme.Typography.fontFamily.bold,
   },
   textLight: {
-    color: Colors.slate900,
+    color: Theme.Colors.slate900,
   },
   textDark: {
-    color: Colors.white,
+    color: Theme.Colors.white,
   },
   subtitle: {
     fontSize: 10,
     letterSpacing: 1,
-    color: Colors.slate500,
-    fontWeight: '500',
+    color: Theme.Colors.slate500,
+    fontFamily: Theme.Typography.fontFamily.medium,
     marginTop: 2,
   },
   rightSection: {
@@ -136,15 +135,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: Colors.white,
+    borderColor: Theme.Colors.white,
     overflow: 'hidden',
   },
   profileCircleLight: {
     backgroundColor: 'rgba(170, 186, 248, 0.2)',
-    borderColor: Colors.white,
+    borderColor: Theme.Colors.white,
   },
   profileCircleDark: {
     backgroundColor: 'rgba(170, 186, 248, 0.2)',
-    borderColor: Colors.slate800,
+    borderColor: Theme.Colors.slate800,
   },
 });

@@ -4,18 +4,17 @@ import {
   View, 
   FlatList, 
   KeyboardAvoidingView, 
-  Platform, 
-  StatusBar 
+  Platform 
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Colors } from '../src/constants/Colors';
+import { Theme } from '../src/constants/Theme';
 import { Header } from '../src/components/chat/Header';
 import { ChatMessage, MessageProps } from '../src/components/chat/ChatMessage';
 import { QuickSuggestions } from '../src/components/chat/QuickSuggestions';
 import { ChatInput } from '../src/components/chat/ChatInput';
 import { BottomNavigation } from '../src/components/chat/BottomNavigation';
-import { useVoiceRecognition } from '../src/hooks/useVoiceRecognition';
+import { ChatBackground } from '../src/components/chat/ChatBackground';
 
 
 const INITIAL_MESSAGES: MessageProps[] = [
@@ -36,27 +35,12 @@ const SUGGESTIONS = [
   "Is honey safe for infants?"
 ];
 
-import { ChatBackground } from '../src/components/chat/ChatBackground';
-
 export default function ChatScreen() {
   const [messages, setMessages] = useState<MessageProps[]>(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   
-  const { 
-    isListening, 
-    transcript, 
-    startListening, 
-    stopListening 
-  } = useVoiceRecognition();
-
-  useEffect(() => {
-    if (transcript) {
-      setInputText(transcript);
-    }
-  }, [transcript]);
-
   const handleSend = (text: string = inputText) => {
     if (!text.trim()) return;
 
@@ -81,6 +65,15 @@ export default function ChatScreen() {
     }, 1000);
   };
 
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (messages.length > INITIAL_MESSAGES.length) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 200);
+    }
+  }, [messages]);
+
   const toggleTheme = () => setDarkMode(!darkMode);
 
   return (
@@ -89,15 +82,15 @@ export default function ChatScreen() {
         styles.safeArea, 
         darkMode ? styles.bgDark : styles.bgLight
       ]}
-      edges={['left', 'right']}
+      edges={['left', 'right', 'bottom']}
     >
       <ChatBackground darkMode={darkMode} />
-      <StatusBar barStyle={darkMode ? "light-content" : "dark-content"} />
       <Header darkMode={darkMode} onThemeToggle={toggleTheme} />
       
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         <FlatList
           ref={flatListRef}
@@ -110,8 +103,13 @@ export default function ChatScreen() {
               darkMode={darkMode} 
             />
           )}
-          contentContainerStyle={styles.messageList}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+          contentContainerStyle={[
+            styles.messageList,
+            { paddingBottom: 100 } // Space for Suggestions + Input
+          ]}
+          onContentSizeChange={() => {
+            flatListRef.current?.scrollToEnd({ animated: true });
+          }}
         />
 
         <View style={styles.bottomSection}>
@@ -125,13 +123,11 @@ export default function ChatScreen() {
             onChangeText={setInputText} 
             onSend={() => handleSend()} 
             darkMode={darkMode} 
-            isRecording={isListening}
-            onRecordStart={startListening}
-            onRecordEnd={stopListening}
           />
-          {/* <BottomNavigation activeTab="chat" darkMode={darkMode} /> */}
         </View>
       </KeyboardAvoidingView>
+      
+      {/* <BottomNavigation activeTab="chat" darkMode={darkMode} /> */}
     </SafeAreaView>
   );
 }
@@ -143,10 +139,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bgLight: {
-    backgroundColor: Colors.backgroundLight,
+    backgroundColor: Theme.Colors.backgroundLight,
   },
   bgDark: {
-    backgroundColor: Colors.backgroundDark,
+    backgroundColor: Theme.Colors.backgroundDark,
   },
   container: {
     flex: 1,

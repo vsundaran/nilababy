@@ -4,12 +4,11 @@ import {
   View, 
   Text, 
   SafeAreaView, 
-  StatusBar,
   Dimensions
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
-import { Colors } from '../src/constants/Colors';
+import { Theme } from '../src/constants/Theme';
 import { GoogleSignInButton } from '../src/components/auth/GoogleSignInButton';
 
 const { width } = Dimensions.get('window');
@@ -30,7 +29,6 @@ export default function SignInScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
       
       {/* Decorative Background Elements */}
       <View style={[styles.shape, styles.shape1]} />
@@ -64,7 +62,7 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.backgroundLight,
+    backgroundColor: Theme.Colors.backgroundLight,
     overflow: 'hidden',
   },
   shape: {
@@ -103,13 +101,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: '700',
-    color: Colors.slate900,
+    color: Theme.Colors.slate900,
     letterSpacing: -0.5,
+    fontFamily: Theme.Typography.fontFamily.bold,
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.slate500,
+    color: Theme.Colors.slate500,
+    fontFamily: Theme.Typography.fontFamily.regular,
     marginTop: 8,
     textAlign: 'center',
   },
@@ -119,7 +118,8 @@ const styles = StyleSheet.create({
   },
   terms: {
     fontSize: 12,
-    color: Colors.slate400,
+    color: Theme.Colors.slate400,
+    fontFamily: Theme.Typography.fontFamily.regular,
     marginTop: 24,
     textAlign: 'center',
     lineHeight: 18,

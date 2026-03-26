@@ -1,6 +1,5 @@
-import React from 'react';
 import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { Colors } from '../../constants/Colors';
+import { Theme } from '../../constants/Theme';
 
 export interface QuickSuggestionsProps {
   suggestions: string[];
@@ -54,19 +53,19 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(170, 186, 248, 0.2)',
   },
   chipLight: {
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.Colors.white,
   },
   chipDark: {
-    backgroundColor: Colors.slate800,
+    backgroundColor: Theme.Colors.slate800,
   },
   text: {
     fontSize: 12,
-    fontWeight: '500',
+    fontFamily: Theme.Typography.fontFamily.medium,
   },
   textLight: {
-    color: Colors.slate700,
+    color: Theme.Colors.slate700,
   },
   textDark: {
-    color: Colors.slate300,
+    color: Theme.Colors.slate300,
   },
 });

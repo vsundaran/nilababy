@@ -1,6 +1,5 @@
-import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../../constants/Colors';
+import { Theme } from '../../constants/Theme';
 import { MaterialIcons } from '@expo/vector-icons';
 
 export interface MessageProps {
@@ -17,7 +16,7 @@ export const ChatMessage: React.FC<MessageProps> = ({ type, content, darkMode = 
       {isAI ? (
         <View style={styles.aiHeader}>
           <View style={styles.aiAvatar}>
-            <MaterialIcons name="brightness-3" size={16} color={Colors.white} />
+            <MaterialIcons name="brightness-3" size={16} color={Theme.Colors.white} />
           </View>
           <Text style={styles.senderName}>Nilababy AI</Text>
         </View>
@@ -65,14 +64,15 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: Colors.primary,
+    backgroundColor: Theme.Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     transform: [{ rotate: '130deg' }]
   },
   senderName: {
     fontSize: 11,
-    color: Colors.slate400,
+    color: Theme.Colors.slate400,
+    fontFamily: Theme.Typography.fontFamily.medium,
   },
   senderNameUser: {
     paddingHorizontal: 8,
@@ -88,17 +88,17 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   bubbleUser: {
-    backgroundColor: Colors.lavenderSoft,
+    backgroundColor: Theme.Colors.lavenderSoft,
   },
   bubbleAILight: {
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.Colors.white,
     borderWidth: 1,
-    borderColor: Colors.slate100,
+    borderColor: Theme.Colors.slate100,
   },
   bubbleAIDark: {
-    backgroundColor: Colors.slate800,
+    backgroundColor: Theme.Colors.slate800,
     borderWidth: 1,
-    borderColor: Colors.slate700,
+    borderColor: Theme.Colors.slate700,
   },
   bubbleUserRounded: {
     borderTopLeftRadius: 24,
@@ -115,14 +115,15 @@ const styles = StyleSheet.create({
   content: {
     fontSize: 14,
     lineHeight: 20,
+    fontFamily: Theme.Typography.fontFamily.regular,
   },
   textUser: {
-    color: Colors.white,
+    color: Theme.Colors.white,
   },
   textAILight: {
-    color: Colors.slate800,
+    color: Theme.Colors.slate800,
   },
   textAIDark: {
-    color: Colors.slate200,
+    color: Theme.Colors.slate200,
   },
 });

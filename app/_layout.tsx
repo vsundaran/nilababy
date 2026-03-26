@@ -1,7 +1,14 @@
 import { Stack } from "expo-router";
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { 
+  useFonts,
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_700Bold 
+} from '@expo-google-fonts/dm-sans';
 import AnimatedSplashScreen from '../src/components/common/AnimatedSplashScreen';
 
 // Keep the splash screen visible while we fetch resources
@@ -11,10 +18,16 @@ export default function RootLayout() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [animationFinished, setAnimationFinished] = useState(false);
 
+  const [fontsLoaded] = useFonts({
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_700Bold,
+  });
+
   useEffect(() => {
     async function prepare() {
       try {
-        // Pre-load fonts, make any API calls you need to do here
+        // Pre-load resources, make any API calls you need to do here
         // For now, we'll just simulate a short delay for a premium feel
         await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (e) {
@@ -29,19 +42,20 @@ export default function RootLayout() {
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
-    if (appIsReady) {
+    if (appIsReady && fontsLoaded) {
       // This tells the splash screen to hide immediately! 
       // The JS-side AnimatedSplashScreen will then handle the transition.
       await SplashScreen.hideAsync();
     }
-  }, [appIsReady]);
+  }, [appIsReady, fontsLoaded]);
 
-  if (!appIsReady) {
+  if (!appIsReady || !fontsLoaded) {
     return null;
   }
 
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
+      <StatusBar style="auto" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="chat" />
