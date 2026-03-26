@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView, 
   Platform 
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Theme } from '../src/constants/Theme';
@@ -84,6 +85,7 @@ export default function ChatScreen() {
       ]}
       edges={['left', 'right', 'bottom']}
     >
+      <StatusBar style={darkMode ? 'light' : 'dark'} />
       <ChatBackground darkMode={darkMode} />
       <Header darkMode={darkMode} onThemeToggle={toggleTheme} />
       

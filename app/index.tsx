@@ -6,6 +6,7 @@ import {
   SafeAreaView, 
   Dimensions
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { Theme } from '../src/constants/Theme';
@@ -29,6 +30,7 @@ export default function SignInScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="dark" />
       
       {/* Decorative Background Elements */}
       <View style={[styles.shape, styles.shape1]} />
