@@ -26,19 +26,36 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   async (config) => {
+    console.log(`\n🚀 [API REQUEST] ${config.method?.toUpperCase()} ${config.baseURL || ''}${config.url}`);
+    if (config.data) console.log(`[REQUEST BODY]:`, JSON.stringify(config.data, null, 2));
+
     const token = await SecureStore.getItemAsync('userToken');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    console.log(`[REQUEST HEADERS]:`, JSON.stringify(config.headers, null, 2));
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error(`\n❌ [API REQUEST ERROR]`, error);
+    return Promise.reject(error);
+  }
 );
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`\n✅ [API RESPONSE] ${response.config.method?.toUpperCase()} ${response.config.baseURL || ''}${response.config.url} - Status: ${response.status}`);
+    console.log(`[RESPONSE DATA]:`, JSON.stringify(response.data, null, 2));
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
+    console.error(`\n❌ [API RESPONSE ERROR] ${originalRequest?.method?.toUpperCase()} ${originalRequest?.baseURL || ''}${originalRequest?.url} - Status: ${error.response?.status}`);
+    if (error.response?.data) {
+       console.error(`[ERROR DATA]:`, JSON.stringify(error.response.data, null, 2));
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const refreshToken = await SecureStore.getItemAsync('refreshToken');

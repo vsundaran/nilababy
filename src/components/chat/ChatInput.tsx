@@ -7,13 +7,15 @@ export interface ChatInputProps {
   onChangeText: (text: string) => void;
   onSend: () => void;
   darkMode?: boolean;
+  disabled?: boolean;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({ 
   value, 
   onChangeText, 
   onSend, 
-  darkMode = false
+  darkMode = false,
+  disabled = false
 }) => {
   return (
     <View style={styles.container}>
@@ -31,12 +33,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           placeholderTextColor={Theme.Colors.slate400}
           value={value}
           onChangeText={onChangeText}
+          editable={!disabled}
         />
         
         <TouchableOpacity 
-          style={styles.sendButton}
+          style={[styles.sendButton, disabled && { opacity: 0.5 }]}
           onPress={onSend}
-          disabled={!value.trim()}
+          disabled={!value.trim() || disabled}
         >
           <MaterialIcons name="send" size={20} color={Theme.Colors.white} />
         </TouchableOpacity>

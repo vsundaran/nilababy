@@ -13,7 +13,7 @@ export const ChatMessage: React.FC<MessageProps> = ({ type, content, darkMode = 
 
   return (
     <View style={[styles.container, isAI ? styles.containerAI : styles.containerUser]}>
-      {isAI ? (
+      {/* {isAI ? (
         <View style={styles.aiHeader}>
           <View style={styles.aiAvatar}>
             <MaterialCommunityIcons name="robot-outline" size={16} color={Theme.Colors.white} />
@@ -22,7 +22,7 @@ export const ChatMessage: React.FC<MessageProps> = ({ type, content, darkMode = 
         </View>
       ) : (
         <Text style={[styles.senderName, styles.senderNameUser]}>You</Text>
-      )}
+      )} */}
       
       <View style={[
         styles.bubble,
@@ -42,7 +42,7 @@ export const ChatMessage: React.FC<MessageProps> = ({ type, content, darkMode = 
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 12,
+    marginVertical: 8,
     maxWidth: '85%',
   },
   containerUser: {

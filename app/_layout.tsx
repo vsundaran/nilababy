@@ -11,6 +11,9 @@ import {
 } from '@expo-google-fonts/dm-sans';
 import AnimatedSplashScreen from '../src/components/common/AnimatedSplashScreen';
 import { AuthProvider } from '../src/context/AuthContext';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { queryClient, asyncStoragePersister } from '../src/services/queryClient';
+import { initDB } from '../src/services/db';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -28,9 +31,9 @@ export default function RootLayout() {
   useEffect(() => {
     async function prepare() {
       try {
-        // Pre-load resources, make any API calls you need to do here
-        // For now, we'll just simulate a short delay for a premium feel
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Pre-load resources, init SQLite database
+        await initDB();
+        await new Promise(resolve => setTimeout(resolve, 500)); // Short delay for premium feel
       } catch (e) {
         console.warn(e);
       } finally {
@@ -55,20 +58,22 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <View style={styles.container} onLayout={onLayoutRootView}>
-        <StatusBar style="auto" />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="chat" />
-        </Stack>
-        {!animationFinished && (
-          <AnimatedSplashScreen 
-            onAnimationComplete={() => setAnimationFinished(true)} 
-          />
-        )}
-      </View>
-    </AuthProvider>
+    <PersistQueryClientProvider client={queryClient} persistOptions={{ persister: asyncStoragePersister }}>
+      <AuthProvider>
+        <View style={styles.container} onLayout={onLayoutRootView}>
+          <StatusBar style="auto" />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="chat" />
+          </Stack>
+          {!animationFinished && (
+            <AnimatedSplashScreen 
+              onAnimationComplete={() => setAnimationFinished(true)} 
+            />
+          )}
+        </View>
+      </AuthProvider>
+    </PersistQueryClientProvider>
   );
 }
 

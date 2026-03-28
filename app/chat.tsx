@@ -1,10 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   StyleSheet, 
   View, 
   FlatList, 
   KeyboardAvoidingView, 
-  Platform 
+  Platform,
+  ActivityIndicator,
+  Text
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,66 +18,107 @@ import { QuickSuggestions } from '../src/components/chat/QuickSuggestions';
 import { ChatInput } from '../src/components/chat/ChatInput';
 import { BottomNavigation } from '../src/components/chat/BottomNavigation';
 import { ChatBackground } from '../src/components/chat/ChatBackground';
-
-
-const INITIAL_MESSAGES: MessageProps[] = [
-  {
-    type: 'user',
-    content: 'Can a 3 month baby drink water?',
-  },
-  {
-    type: 'ai',
-    content: 'Many parents wonder about this. Babies under 6 months usually get all the hydration they need from breast milk or formula. Giving water too early may reduce milk intake.',
-  }
-];
-
-const SUGGESTIONS = [
-  "Baby crying too much",
-  "Can babies drink water?",
-  "Baby not sleeping",
-  "Is honey safe for infants?"
-];
+import { useConversations, useMessages, useSendMessage, useSuggestions } from '../src/hooks/useChatQueries';
+import { ChatSkeleton } from '../src/components/chat/ChatSkeleton';
+import { TypingIndicator } from '../src/components/chat/TypingIndicator';
 
 export default function ChatScreen() {
-  const [messages, setMessages] = useState<MessageProps[]>(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+  const [activeConversationId, setActiveConversationId] = useState<string | undefined>();
   const flatListRef = useRef<FlatList>(null);
   
+  // Queries
+  const { data: suggestionsData } = useSuggestions();
+  const { data: conversations, isLoading: conversationsLoading } = useConversations();
+  
+  // Auto-resume last active conversation if possible
+  useEffect(() => {
+    if (conversations && conversations.length > 0 && !activeConversationId) {
+       setActiveConversationId(conversations[0]._id);
+    }
+  }, [conversations, activeConversationId]);
+
+  const { data: messages = [], isLoading: messagesLoading } = useMessages(activeConversationId);
+  const { mutate: sendMessage, isPending } = useSendMessage();
+
+  const formattedSuggestions = useMemo(() => {
+    if (!suggestionsData || suggestionsData.length === 0) {
+      return ["Baby crying too much", "Can babies drink water?", "Baby not sleeping", "Is honey safe for infants?"];
+    }
+    return suggestionsData.map(s => s.text);
+  }, [suggestionsData]);
+
   const handleSend = (text: string = inputText) => {
-    if (!text.trim()) return;
+    if (!text.trim() || isPending) return;
 
-    const newUserMessage: MessageProps = {
-      type: 'user',
-      content: text,
-      darkMode
-    };
+    const targetConvId = activeConversationId || `temp_conv_${Date.now()}`;
+    if (!activeConversationId) {
+       setActiveConversationId(targetConvId);
+    }
 
-    setMessages(prev => [...prev, newUserMessage]);
+    sendMessage(
+      { content: text, conversationId: targetConvId },
+      {
+        onSuccess: (newRealConvId) => {
+           // Update the active ID to the permanent ID returned by the backend
+           if (targetConvId !== newRealConvId) {
+             setActiveConversationId(newRealConvId);
+           }
+        }
+      }
+    );
     setInputText('');
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse: MessageProps = {
-        type: 'ai',
-        content: "I'm processing your question about baby care. Please remember I'm an AI assistant and you should consult a pediatrician for medical advice.",
-        darkMode
-      };
-      setMessages(prev => [...prev, aiResponse]);
-      flatListRef.current?.scrollToEnd({ animated: true });
-    }, 1000);
   };
 
-  // Scroll to bottom when messages change
+  // Scroll to bottom when messages change or typing begins
   useEffect(() => {
-    if (messages.length > INITIAL_MESSAGES.length) {
+    if (messages.length > 0 || isPending) {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 200);
     }
-  }, [messages]);
+  }, [messages, isPending]);
 
   const toggleTheme = () => setDarkMode(!darkMode);
+
+  const renderContent = () => {
+    // Show skeleton only if loading first time and not currently sending a message
+    const isFetchingInitial = (conversationsLoading || (activeConversationId && messagesLoading));
+    if (isFetchingInitial && !isPending && messages.length === 0) {
+       return <View style={styles.skeletonWrapper}><ChatSkeleton darkMode={darkMode} /></View>;
+    }
+
+    return (
+      <FlatList
+        ref={flatListRef}
+        data={messages}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <ChatMessage 
+            type={item.sender as unknown as MessageProps['type']} 
+            content={item.content} 
+            darkMode={darkMode} 
+          />
+        )}
+        ListFooterComponent={isPending ? <TypingIndicator darkMode={darkMode} /> : null}
+        contentContainerStyle={[
+          styles.messageList,
+          { paddingBottom: 10 } 
+        ]}
+        onContentSizeChange={() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        }}
+        ListEmptyComponent={
+           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 100 }}>
+              <Text style={{ fontSize: Theme.Typography.fontSize.lg, fontFamily: Theme.Typography.fontFamily.medium, color: darkMode ? '#8E8E93' : '#AEAEB2' }}>
+                 Start a new chat
+              </Text>
+           </View>
+        }
+      />
+    );
+  };
 
   return (
     <SafeAreaView 
@@ -94,37 +137,20 @@ export default function ChatScreen() {
         style={styles.container}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item }) => (
-            <ChatMessage 
-              type={item.type} 
-              content={item.content} 
-              darkMode={darkMode} 
-            />
-          )}
-          contentContainerStyle={[
-            styles.messageList,
-            { paddingBottom: 100 } // Space for Suggestions + Input
-          ]}
-          onContentSizeChange={() => {
-            flatListRef.current?.scrollToEnd({ animated: true });
-          }}
-        />
+        {renderContent()}
 
         <View style={styles.bottomSection}>
-          <QuickSuggestions 
-            suggestions={SUGGESTIONS} 
+          {/* <QuickSuggestions 
+            suggestions={formattedSuggestions} 
             onSelect={handleSend} 
             darkMode={darkMode} 
-          />
+          /> */}
           <ChatInput 
             value={inputText} 
             onChangeText={setInputText} 
             onSend={() => handleSend()} 
             darkMode={darkMode} 
+            disabled={isPending}
           />
         </View>
       </KeyboardAvoidingView>
@@ -133,8 +159,6 @@ export default function ChatScreen() {
     </SafeAreaView>
   );
 }
-
-
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -157,4 +181,8 @@ const styles = StyleSheet.create({
   bottomSection: {
     paddingTop: 8,
   },
+  skeletonWrapper: {
+    flex: 1,
+    marginTop: 20,
+  }
 });
