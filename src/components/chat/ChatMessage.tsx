@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Theme } from '../../constants/Theme';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export interface MessageProps {
   type: 'user' | 'ai';
@@ -16,7 +16,7 @@ export const ChatMessage: React.FC<MessageProps> = ({ type, content, darkMode = 
       {isAI ? (
         <View style={styles.aiHeader}>
           <View style={styles.aiAvatar}>
-            <MaterialIcons name="brightness-3" size={16} color={Theme.Colors.white} />
+            <MaterialCommunityIcons name="robot-outline" size={16} color={Theme.Colors.white} />
           </View>
           <Text style={styles.senderName}>Nilababy AI</Text>
         </View>
@@ -67,7 +67,6 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    transform: [{ rotate: '130deg' }]
   },
   senderName: {
     fontSize: 11,

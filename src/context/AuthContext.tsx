@@ -63,7 +63,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsLoading(true);
       const res = await authService.loginWithGoogle(idToken);
       if (res.success) {
-        await authService.saveToken(res.data.token);
+        await authService.saveTokens(res.data.token, res.data.refreshToken);
+        await authService.saveUser(res.data.user);
         setUser(res.data.user);
         router.replace('/chat');
       }
@@ -78,10 +79,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const token = await authService.getToken();
       if (token) {
-        // In a real app, you might want to verify the token with the backend here
-        // or store the user object in SecureStore as well.
-        // For simplicity, we'll assume the token is valid if it exists.
-        // We'd ideally fetch profile from backend here.
+        const userProfile = await authService.getUser();
+        if (userProfile) {
+          setUser(userProfile);
+          router.replace('/chat');
+        }
       }
     } catch (error) {
       console.error('Failed to check auth status', error);
@@ -104,7 +106,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const signOut = async () => {
     try {
       setIsLoading(true);
-      await authService.removeToken();
+      await authService.removeTokens();
       setUser(null);
       router.replace('/');
     } catch (error) {

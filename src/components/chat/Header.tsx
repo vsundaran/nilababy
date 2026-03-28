@@ -2,6 +2,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Theme } from '../../constants/Theme';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
+import { useAuth } from '../../hooks/useAuth';
+
+import { Ionicons } from '@expo/vector-icons';
 
 export interface HeaderProps {
   darkMode?: boolean;
@@ -10,6 +14,7 @@ export interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ darkMode = false, onThemeToggle }) => {
   const insets = useSafeAreaInsets();
+  const { user } = useAuth();
   
   return (
     <View style={[
@@ -24,7 +29,35 @@ export const Header: React.FC<HeaderProps> = ({ darkMode = false, onThemeToggle 
             source={require('../../../assets/images/nilababy-logo.png')} 
             style={styles.logo}
           /> */}
-          <TouchableOpacity 
+
+
+          <View style={styles.rightSection}>
+          {user?.picture ? (
+            <Image 
+              source={user.picture} 
+              style={[styles.profileCircle, darkMode ? styles.profileCircleDark : styles.profileCircleLight]} 
+              contentFit="cover"
+            />
+          ) : (
+            <View style={[styles.profileCircle, darkMode ? styles.profileCircleDark : styles.profileCircleLight]}>
+              <MaterialIcons name="person" size={24} color={Theme.Colors.primary} />
+            </View>
+          )}
+        </View>
+
+          
+        </View>
+
+        <View style={styles.centerSection}>
+          <View style={styles.titleRow}>
+            <Text style={[styles.title, darkMode ? styles.textDark : styles.textLight]}>
+              Nilababy
+            </Text>
+          </View>
+          <Text style={styles.subtitle}>YOUR CALM GUIDE FOR BABY CARE</Text>
+        </View>
+
+<TouchableOpacity 
             onPress={onThemeToggle} 
             style={[styles.iconButton, darkMode ? styles.iconButtonDark : styles.iconButtonLight]}
           >
@@ -34,23 +67,7 @@ export const Header: React.FC<HeaderProps> = ({ darkMode = false, onThemeToggle 
               color={Theme.Colors.primary} 
             />
           </TouchableOpacity>
-        </View>
-
-        <View style={styles.centerSection}>
-          <View style={styles.titleRow}>
-            <Text style={[styles.title, darkMode ? styles.textDark : styles.textLight]}>
-              Nilababy
-            </Text>
-            {/* <MaterialIcons name="brightness-3" size={14} color={Colors.primary} /> */}
-          </View>
-          <Text style={styles.subtitle}>YOUR CALM GUIDE FOR BABY CARE</Text>
-        </View>
-
-        <View style={styles.rightSection}>
-          {/* <View style={[styles.profileCircle, darkMode ? styles.profileCircleDark : styles.profileCircleLight]}>
-            <MaterialIcons name="person" size={24} color={Colors.primary} />
-          </View> */}
-        </View>
+        
       </View>
     </View>
   );
