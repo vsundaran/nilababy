@@ -10,6 +10,7 @@ import {
   DMSans_700Bold 
 } from '@expo-google-fonts/dm-sans';
 import AnimatedSplashScreen from '../src/components/common/AnimatedSplashScreen';
+import { AuthProvider } from '../src/context/AuthContext';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -54,18 +55,20 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
-      <StatusBar style="auto" />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="chat" />
-      </Stack>
-      {!animationFinished && (
-        <AnimatedSplashScreen 
-          onAnimationComplete={() => setAnimationFinished(true)} 
-        />
-      )}
-    </View>
+    <AuthProvider>
+      <View style={styles.container} onLayout={onLayoutRootView}>
+        <StatusBar style="auto" />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="chat" />
+        </Stack>
+        {!animationFinished && (
+          <AnimatedSplashScreen 
+            onAnimationComplete={() => setAnimationFinished(true)} 
+          />
+        )}
+      </View>
+    </AuthProvider>
   );
 }
 

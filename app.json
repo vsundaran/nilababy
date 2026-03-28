@@ -5,13 +5,21 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/Logo.png",
-    "scheme": "nilababy",
+    "scheme": [
+      "nilababy",
+      "com.googleusercontent.apps.1036485508756-2691f7sl9jolq9gk96tk7hghvu1hin61",
+      "com.googleusercontent.apps.1036485508756-t01c8ba7vmudg8afbrsqktavu8glg1ir"
+    ],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.sundaranv.nilababy",
+      "supportsTablet": true,
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
+      "package": "com.sundaranv.nilababy",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/images/Logo.png",
@@ -48,6 +56,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "45cf0476-4e92-426f-824e-9a5580b0b7d7"
+      }
     }
   }
 }

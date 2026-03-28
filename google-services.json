@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "680650605701",
+    "project_id": "nilababy-3d7f8",
+    "storage_bucket": "nilababy-3d7f8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:680650605701:android:4d29f58d878037d73295ec",
+        "android_client_info": {
+          "package_name": "com.sundaranv.nilababy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "680650605701-ibjl978nijub8uebu3odq5957c6s2eu5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sundaranv.nilababy",
+            "certificate_hash": "87c31609a72cf5504b2e246a4e8b8539c33c3318"
+          }
+        },
+        {
+          "client_id": "680650605701-v81f7kt4mpl5hpsbef53ukoo6en57i8n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sundaranv.nilababy",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "680650605701-4tlt6poo0u6s5u0ro4dc4qbgrfg2fre0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwUygaynFPh8CX1c_kDGVC_oBbB-acPas"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "680650605701-4tlt6poo0u6s5u0ro4dc4qbgrfg2fre0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "680650605701-clt2dh92phs1mb4cclcd2blls4ljukn9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.sundaranv.nilababy"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -11,21 +11,15 @@ import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { Theme } from '../src/constants/Theme';
 import { GoogleSignInButton } from '../src/components/auth/GoogleSignInButton';
+import { useAuth } from '../src/hooks/useAuth';
 
 const { width } = Dimensions.get('window');
 
-export default function SignInScreen() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+function SignInScreen() {
+  const { signIn, isLoading } = useAuth();
 
-  const handleGoogleSignIn = () => {
-    setIsLoading(true);
-    
-    // Simulate authentication process
-    setTimeout(() => {
-      setIsLoading(false);
-      router.replace('/chat');
-    }, 1500);
+  const handleGoogleSignIn = async () => {
+    await signIn();
   };
 
   return (
@@ -60,6 +54,8 @@ export default function SignInScreen() {
     </SafeAreaView>
   );
 }
+
+export default SignInScreen;
 
 const styles = StyleSheet.create({
   container: {
