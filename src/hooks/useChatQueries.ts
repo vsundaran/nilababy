@@ -95,6 +95,32 @@ export const useSendMessage = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    onMutate: async ({ content, conversationId }) => {
+      // Create optimistic message
+      const now = Date.now();
+      const localTempId = 'temp_' + now;
+      const currentConvId = conversationId || 'temp_conv_' + now;
+
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries({ queryKey: ['messages', currentConvId] });
+
+      // Snapshot the previous value
+      const previousMessages = queryClient.getQueryData(['messages', currentConvId]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(['messages', currentConvId], (old: any) => {
+        const newMessage = {
+          _id: localTempId,
+          conversationId: currentConvId,
+          sender: 'user',
+          content,
+          createdAt: new Date(now).toISOString()
+        };
+        return old ? [...old, newMessage] : [newMessage];
+      });
+
+      return { previousMessages, currentConvId };
+    },
     mutationFn: async ({ content, conversationId }: { content: string, conversationId?: string }) => {
       const db = getDB();
       const localTempId = 'temp_' + Date.now();
@@ -102,9 +128,9 @@ export const useSendMessage = () => {
 
       // Ensure we have a conversation object local for completely new chats
       let currentConvId = conversationId || 'temp_conv_' + now;
-      if (!conversationId) {
+      if (!conversationId || conversationId.startsWith('temp_')) {
          await db.execAsync(`
-            INSERT INTO conversations (id, title, lastMessageAt, updatedAt) 
+            INSERT OR REPLACE INTO conversations (id, title, lastMessageAt, updatedAt) 
             VALUES ('${currentConvId}', 'New Chat', ${now}, ${now});
           `);
       }
@@ -115,25 +141,19 @@ export const useSendMessage = () => {
         VALUES ('${localTempId}', '${currentConvId}', 'user', '${content.replace(/'/g, "''")}', ${now}, 1);
       `);
 
-      // Invalidate to show local optimistic instantly
-      queryClient.invalidateQueries({ queryKey: ['messages', currentConvId] });
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
-
-      // Call API
-      const response = await chatApi.sendMessage(content, conversationId);
+      // Call API (we do not invalidate here so optimistic UI isn't overwritten mid-flight)
+      const response = await chatApi.sendMessage(content, conversationId?.startsWith('temp_') ? undefined : conversationId);
       
       // Update SQLite with real IDs and AI message
       const realConvId = response.conversation._id;
       
-      // If we created a temporary conversation, replace its ID in DB (cascade will handle messages if enabled correctly, 
-      // but let's manually update just in case)
-      if (!conversationId) {
+      // If we created a temporary conversation, replace its ID in DB
+      if (!conversationId || conversationId.startsWith('temp_')) {
         await db.execAsync(`
           INSERT OR REPLACE INTO conversations (id, title, lastMessageAt, updatedAt) 
           VALUES ('${realConvId}', '${response.conversation.title.replace(/'/g, "''")}', ${Date.now()}, ${Date.now()});
         `);
-        // We delete the temp one and its messages to avoid duplicate ghosts, 
-        // since we are inserting the permanent ones below
+        // We delete the temp one and its messages 
         await db.execAsync(`DELETE FROM messages WHERE conversationId = '${currentConvId}'`);
         await db.execAsync(`DELETE FROM conversations WHERE id = '${currentConvId}'`);
       } else {
@@ -156,8 +176,12 @@ export const useSendMessage = () => {
       // Return the real conversation ID so the UI can switch to it
       return realConvId;
     },
-    onSuccess: (newConvId, variables) => {
-      // Invalidate both possible keys (if it changed from undefined -> new ID)
+    onError: (err, variables, context: any) => {
+      if (context?.previousMessages && context?.currentConvId) {
+        queryClient.setQueryData(['messages', context.currentConvId], context.previousMessages);
+      }
+    },
+    onSuccess: (newConvId, variables, context) => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
     },

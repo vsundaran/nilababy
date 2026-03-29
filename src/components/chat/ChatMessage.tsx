@@ -26,7 +26,7 @@ export const ChatMessage: React.FC<MessageProps> = ({ type, content, darkMode = 
       
       <View style={[
         styles.bubble,
-        isAI ? (darkMode ? styles.bubbleAIDark : styles.bubbleAILight) : styles.bubbleUser,
+        isAI ? (darkMode ? styles.bubbleAIDark : styles.bubbleAILight) :styles.bubbleUser,
         isAI ? styles.bubbleAIRounded : styles.bubbleUserRounded
       ]}>
         <Text style={[
